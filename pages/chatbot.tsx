@@ -282,7 +282,7 @@ export default function Chatbot() {
                   ...state.messages,
                   {
                     type: 'apiMessage',
-                    message: pending ?? '',
+                    message: state.pending ?? '',
                     sourceDocs: state.pendingSourceDocs,
                   },
                 ],
