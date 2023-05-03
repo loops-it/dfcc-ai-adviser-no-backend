@@ -308,7 +308,7 @@ export default function Chatbottest() {
                     } else {
                       newMessages.push({
                         type: 'apiMessage',
-                        message: translatedMessage,
+                        message: "Hi",
                         sourceDocs: state.pendingSourceDocs,
                       });
                     }
