@@ -22,7 +22,12 @@ export default function Chatbot() {
     history: [string, string][];
     pendingSourceDocs?: Document[];
   }>({
-    messages: [],
+    messages: [
+      {
+        message: 'Hi, what would you like to learn about DFCC Bank?',
+        type: 'apiMessage',
+      },
+    ],
     history: [],
     pendingSourceDocs: [],
   });
@@ -582,7 +587,7 @@ console.log(messages)
           <div className="d-flex justify-content-center pt-1">
             <Image src="/chat-logo.png" alt="AI" width={180} height={50} />
           </div>
-          <div
+          {/* <div
             className={`${styles.botChatMsgContainer} d-flex flex-column my-2`}
           >
             <div className="d-flex">
@@ -645,9 +650,8 @@ console.log(messages)
                   </div>
                 </div>
               </div>
-              {/* <p className={`${styles.timeText} text-start  mt-2`}>{time}</p> */}
             </div>
-          </div>
+          </div> */}
         </div>
 
 
