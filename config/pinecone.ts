@@ -8,7 +8,7 @@ if (!process.env.PINECONE_INDEX_NAME) {
 
 const PINECONE_INDEX_NAME = process.env.PINECONE_INDEX_NAME ?? '';
 
-const PINECONE_NAME_SPACE = 'chatbot-embeddings'; //namespace is optional for your vectors
+const PINECONE_NAME_SPACE = 'dfcc-chatbot-embeddings'; //namespace is optional for your vectors
 const NAME_SPACES_BY_NAME:{
   [key:number]: string
 } = {
