@@ -11,11 +11,7 @@ import { Document } from 'langchain/document';
 export default function Chatbot() {
   const [query, setQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  // const [sourceDocs, setSourceDocs] = useState<Document[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  // const [apiMessageFinal, setApiMessageFinal] = useState('');
-
   const [messageState, setMessageState] = useState<{
     messages: Message[];
     pending?: string;
@@ -31,40 +27,18 @@ export default function Chatbot() {
     history: [],
     pendingSourceDocs: [],
   });
-
-  // const [resMessageState, setResMessageState] = useState<{
-  //   messages: Message[];
-  //   pending?: string;
-  //   history: [string, string][];
-  //   pendingSourceDocs?: Document[];
-  // }>({
-  //   messages: [],
-  //   history: [],
-  //   pendingSourceDocs: [],
-  // });
-
   const { messages, pending, history, pendingSourceDocs } = messageState;
-
   const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState('ENGLISH');
-  const [trMsg, setTrMsg] = useState('');
   const [id, setId] = useState('');
   const [checkNotSure, setCheckNotSure] = useState(false);
-  // const [liveAgent, setLiveAgent] = useState(false);
   const [rating, setRating] = useState(0);
-  const [feedback, setFeedback] = useState(0);
   const [hover, setHover] = useState(0);
   const [inputValue, setInputValue] = useState('');
   const [showChatRating, setShowChatRating] = useState(false);
   const [agentName, setAgentName] = useState('');
   const [agentInfoMsg, setAgentInfoMsg] = useState(false);
   const [agentImage, setAgentImage] = useState('/chat-header.png');
-
-
-
-
-
 
 
 
@@ -85,124 +59,6 @@ export default function Chatbot() {
   useEffect(() => {
     // console.log("text there : ", checkNotSure)
   }, [checkNotSure, agentName, agentInfoMsg, agentImage]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // async function handleTranslation(response: string) {
-  //   const responseTranslate = await fetch(
-  //     'http://localhost:5000/translate-to-language',
-  //     {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         resultMessage: response,
-  //         language: selectedLanguage,
-  //         chatId: id,
-  //       }),
-  //     },
-  //   );
-
-  //   if (responseTranslate.status !== 200) {
-  //     const error = await responseTranslate.json();
-  //     throw new Error(error.message);
-  //   }
-  //   const botMessage = await responseTranslate.json();
-  //   const translatedMessage = botMessage.translations[0];
-
-  //   console.log(translatedMessage);
-
-  //   return translatedMessage;
-  // }
-
-
-
-
-
-
-
-
-
-
-
-
-  // useEffect(() => {
-
-  //   if (liveAgent === true) {
-  //     console.log("----------", id)
-  //     const interval = setInterval(async () => {
-  //       const response = await fetch('http://localhost:5000/live-chat-agent', {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify({ chatId: id }),
-  //       });
-
-  //       if (response.status !== 200) {
-  //         const error = await response.json();
-  //         throw new Error(error.message);
-  //       }
-  //       const data = await response.json();
-  //       setAgentName(data.agentName);
-  //       setAgentInfoMsg(true);
-  //       setAgentImage(data.agentImage);
-  //       console.log('live chat agent : ', data.agent_id);
-  //       console.log('live chat name : ', data.agentName);
-  //       console.log('live chat status : ', data.chat_status);
-  //       console.log('live chat message : ', data.agent_message);
-  //       if (data.chat_status === "closed") {
-  //         setShowChatRating(true);
-  //       }
-  //       else {
-  //         setShowChatRating(false);
-  //         if (data.agent_message != null) {
-  //           setMessageState((state) => ({
-  //             ...state,
-  //             messages: [
-  //               ...state.messages,
-  //               {
-  //                 type: 'apiMessage',
-  //                 message: data.agent_message,
-  //               },
-  //             ],
-  //             pending: undefined,
-  //           }));
-  //         }
-  //       }
-  //     }, 5000);
-
-  //     // {data && (
-  //     //     <p>{data.message}</p>
-  //     //   )}
-
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [id, liveAgent]);
-
-
-
-
-
-
-
-
 
 
 
@@ -243,27 +99,6 @@ export default function Chatbot() {
       setLoading(true);
       setQuery('');
       setMessageState((state) => ({ ...state, pending: '' }));
-
-      // translate to sinhala
-      // const response = await fetch('http://localhost:5000/translate-to-english', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     user_Message: question,
-      //     language: selectedLanguage,
-      //     chatId: id,
-      //   }),
-      // });
-
-      // if (response.status !== 200) {
-      //   const error = await response.json();
-      //   throw new Error(error.message);
-      // }
-      // const data = await response.json();
-      // question = data.translationsToEng[0];
-      // console.log('translatesd user message : ', data.translationsToEng[0]);
 
       const ctrl = new AbortController();
 
@@ -310,55 +145,6 @@ export default function Chatbot() {
                   pending: (state.pending ?? '') + data.data,
                 }));
               }
-              // try {
-              //   const data = JSON.parse(event.data);
-              //   if (data.sourceDocs) {
-              //     setMessageState((state) => ({
-              //       ...state,
-              //       pendingSourceDocs: data.sourceDocs,
-              //     }));
-              //   } else {
-
-              //     if (data.data.includes("Hmm")) {
-              //       setCheckNotSure(true);
-              //     }
-
-              //     const translatedMessage = await handleTranslation(data.data);
-              //     setMessageState((state) => {
-              //       const lastMessage = state.messages[state.messages.length - 1];
-              //       let newMessages = [...state.messages];
-              //       if (lastMessage && lastMessage.type === 'apiMessage') {
-              //         newMessages[newMessages.length - 1] = {
-              //           type: 'apiMessage',
-              //           message: lastMessage.message + '\n' + translatedMessage,
-              //           sourceDocs: state.pendingSourceDocs,
-              //         };
-              //       } else {
-              //         newMessages.push({
-              //           type: 'apiMessage',
-              //           message: translatedMessage,
-              //           sourceDocs: state.pendingSourceDocs,
-              //         });
-              //       }
-              //       return {
-              //         history: [
-              //           ...state.history,
-              //           [question, state.pending ?? ''],
-              //         ],
-              //         messages: newMessages,
-              //         pending: undefined,
-              //         pendingSourceDocs: undefined,
-              //       };
-              //     });
-              //   }
-              // } catch (error) {
-              //   setLoading(false);
-              //   setError(
-              //     'An error occurred while fetching the data. Please try again.',
-              //   );
-              //   console.log('error', error);
-              //   ctrl.abort();
-              // }
             }
           },
         });
@@ -369,83 +155,6 @@ export default function Chatbot() {
       }
     // }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // const handleLiveAgent = async (e: any) => {
-  //   e.preventDefault();
-
-  //   setError(null);
-
-  //   if (!query) {
-  //     alert('Please input a question');
-  //     return;
-  //   }
-  //   let question = query.trim();
-  //   console.log('========== Go to live agent =========')
-  //   if (liveAgent === true) {
-  //     const response = await fetch('http://localhost:5000/live-chat-user', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ chatId: id, user_Message: question }),
-  //     });
-
-  //     if (response.status !== 200) {
-  //       const error = await response.json();
-  //       throw new Error(error.message);
-  //     }
-  //     const data = await response.json();
-
-
-  //     console.log('live chat agent : ', data.agent_id);
-  //     console.log('live chat status : ', data.chat_status);
-  //     console.log('live chat message : ', data.agent_message);
-  //     setQuery('');
-  //   }
-  // }
-
-
-
-  // const SwitchToLiveAgent = async () => {
-  //   console.log('========== Switch to live agent =========')
-  //     const response = await fetch('http://localhost:5000/switch-to-live-agent', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ chatId: id }),
-  //     });
-
-  //     if (response.status !== 200) {
-  //       const error = await response.json();
-  //       throw new Error(error.message);
-  //     }
-  //     const data = await response.json();
-  //     console.log('if success : ',data.success)
-  //     if(data.success === 'Success'){
-  //       setLiveAgent(true);
-  //     }
-  // }
-
-
-
-
-
-
 
 
 
@@ -473,17 +182,6 @@ export default function Chatbot() {
 
 
 
-
-
-
-
-
-  // const chatMessages = useMemo(() => {
-  //   return messages.filter(
-  //     (message) =>
-  //       message.type === 'userMessage' || message.message !== undefined,
-  //   );
-  // }, [messages]);
   const chatMessages = useMemo(() => {
     return [
       ...messages,
@@ -504,15 +202,6 @@ export default function Chatbot() {
 
 
 
-
-
-
-
-
-
-
-
-
   //scroll to bottom of chat
   useEffect(() => {
     if (messageListRef.current) {
@@ -521,43 +210,6 @@ export default function Chatbot() {
   }, [chatMessages]);
 
 console.log(messages)
-
-
-
-
-
-
-
-  // async function sendRateValues() {
-  //   // const sendData = async (botName, index) => {
-  //   try {
-  //     const response = await fetch('http://localhost:5000/save-rating', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         chatId: id,
-  //         ratingValue: rating,
-  //         feedbakMessage: inputValue,
-  //       }),
-  //     });
-  //     const ratingData = await response.json();
-  //     // console.log(ratingData)
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  //   // }
-  //   // console.log(inputValue);
-  //   // console.log(rating);
-  // }
-
-
-
-
-
-
-
 
 
 
@@ -577,108 +229,15 @@ console.log(messages)
       <div className={`${styles.messageWrapper}`}>
 
 
-
-
-
-
-
-
         <div className={styles.botMessageContainerWrapper}>
           <div className="d-flex justify-content-center pt-1">
             <Image src="/chat-logo.png" alt="AI" width={180} height={50} />
           </div>
-          {/* <div
-            className={`${styles.botChatMsgContainer} d-flex flex-column my-2`}
-          >
-            <div className="d-flex">
-              <Image src="/chat-header.png" alt="AI" width="40" height="40" />
-            </div>
-            <div className={`d-flex flex-column py-3`}>
-              <div
-                className={`welcomeMessageContainer d-flex flex-column align-items-center`}
-              >
-                <Image
-                  src="/language-img.png"
-                  alt="AI"
-                  width={220}
-                  height={150}
-                />
-                <p className="mt-2">
-                  Hello, Welcome to DFCC Bank. Please select the language to get
-                  started.
-                </p>
-                <p className="">
-                  ආයුබෝවන්, DFCC බැංකුවට සාදරයෙන් පිළිගනිමු. ඔබේ ප්‍රශ්නවලට
-                  පිළිතුරු සැපයීම සඳහා කරුණාකර භාෂාව තෝරන්න.
-                </p>
-                <p className="">
-                  வணக்கம், DFCC வங்கிக்கு உங்களை வரவேற்கிறோம். தொடர்வதற்கு,
-                  விருப்பமான மொழியைத் தேர்ந்தெடுக்கவும்
-                </p>
-
-                <div className="d-flex flex-row welcome-language-select">
-                  <div className="col-4 p-1">
-                    <button
-                      className=" px-3 py-2 rounded"
-                      onClick={() => {
-                        setSelectedLanguage('ENGLISH');
-                      }}
-                    >
-                      English
-                    </button>
-                  </div>
-                  <div className="col-4 p-1">
-                    <button
-                      className="px-3 py-2 rounded"
-                      onClick={() => {
-                        setSelectedLanguage('SINHALA');
-                      }}
-                    >
-                      Sinhala
-                    </button>
-                  </div>
-
-                  <div className="col-4 p-1">
-                    <button
-                      className="px-3 py-2 rounded"
-                      onClick={() => {
-                        setSelectedLanguage('TAMIL');
-                      }}
-                    >
-                      Tamil
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> */}
         </div>
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        {/* {
-          agentInfoMsg && (
-            <div className="alert alert-info mx-3 text-center  alert-dismissible fade show" role="alert">
-              Now you are chatting with {agentName}
-              <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          )
-        } */}
         <div
           ref={messageListRef}
           className={`${styles.messageContentWrapper} d-flex flex-column`}
@@ -689,8 +248,6 @@ console.log(messages)
             let userHomeStyles;
             let wrapper = 'align-items-end justify-content-end';
             let userStyles = 'justify-content-end flex-row-reverse float-end';
-            // let visibility = 'd-none';
-            // console.log("msg : ", message)
 
             if (message.type === 'apiMessage') {
               icon = (
@@ -726,11 +283,6 @@ console.log(messages)
                   : styles.usermessage;
             }
 
-            // const isLastApiMessageWithNotSure =
-            //   message.type === 'apiMessage' &&
-            //   message.message.includes("Hmm") &&
-            //   index === chatMessages.length - 1;
-
 
             return (
               <>
@@ -747,25 +299,8 @@ console.log(messages)
                         className={`${styles.botMessageContainer} ${userHomeStyles} d-flex flex-column my-1`}
                       >
                         <p className="mb-0">{message.message}</p>
-                        {/* {message.type === 'apiMessage' && (
-                          <div
-                            className={`${styles.botMessageContainer} ${styles.apimessage} d-flex flex-column my-1`}
-                          >
-                            <p className="mb-0">{trMsg}</p>
-                          </div>
-                        )} */}
-                        {/* {isLastApiMessageWithNotSure && (
-                          <button
-                            className={`bg-dark rounded text-white py-2 px-3 my-3`}
-                            style={{ width: 'max-content', alignSelf: 'center' }}
-                          // onClick={() => { SwitchToLiveAgent() }}
-                          >
-                            Connect with Live Agent
-                          </button>
-                        )} */}
                       </div>
 
-                      {/* <p className={`${styles.timeText} text-start  mt-2`}>{time}</p> */}
                     </div>
                   </div>
                 </div>
@@ -773,14 +308,6 @@ console.log(messages)
               </>
             );
           })}
-
-
-
-
-
-
-
-
 
 
 
@@ -835,7 +362,6 @@ console.log(messages)
                         />
 
                         <button
-                          // onClick={sendRateValues}
                           className="text-white bg-dark p-2 mt-2 rounded"
                         >
                           SEND
@@ -844,7 +370,6 @@ console.log(messages)
                     </div>
                   </div>
                 </div>
-                {/* <p className={`${styles.timeText} text-start  mt-2`}>{time}</p> */}
               </div>
             </div>
           )
