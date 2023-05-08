@@ -39,6 +39,7 @@ export default function Chatbot() {
   const [agentName, setAgentName] = useState('');
   const [agentInfoMsg, setAgentInfoMsg] = useState(false);
   const [agentImage, setAgentImage] = useState('/chat-header.png');
+  const [greeting, setGreeting] = useState(false);
 
 
 
@@ -58,7 +59,7 @@ export default function Chatbot() {
 
   useEffect(() => {
     // console.log("text there : ", checkNotSure)
-  }, [checkNotSure, agentName, agentInfoMsg, agentImage]);
+  }, [checkNotSure, agentName, agentInfoMsg, agentImage, greeting]);
 
 
 
@@ -70,38 +71,131 @@ export default function Chatbot() {
   //handle form submission
   async function handleSubmit(e: any) {
     // if (liveAgent === false) {
-      e.preventDefault();
+    e.preventDefault();
 
-      setError(null);
+    setError(null);
 
-      if (!query) {
-        alert('Please input a question');
-        return;
+    if (!query) {
+      alert('Please input a question');
+      return;
+    }
+    // get user message
+    let question = query.trim();
+
+    // set user message array
+    setMessageState((state) => ({
+      ...state,
+      messages: [
+        ...state.messages,
+        {
+          type: 'userMessage',
+          message: question,
+        },
+      ],
+      pending: undefined,
+    }));
+
+    console.log('user message : ', question);
+
+    setLoading(true);
+    setQuery('');
+    setMessageState((state) => ({ ...state, pending: '' }));
+
+    const ctrl = new AbortController();
+
+    // const greetingTypes = [
+    //   "Hi", 
+    //   "Hello", 
+    //   "Hi,there", 
+    //   "Good morning", 
+    //   "Thank you", 
+    //   "How are you ?", 
+    //   "How are you bot", 
+    //   "What is your name",
+    //   "Good afternoon", 
+    //   "Good evening", 
+    //   "Good night",
+    // ];
+    // const regex = new RegExp(`^(${greetingTypes.join("|")})$`, "i");
+    // const greetingIncluded = regex.test(question.trim());
+
+    const greetingTypes = [
+      ["Hi", "Hello there!"],
+    ["Hello", "Hi!"],
+    ["Hi,there", "Hi! How can I assist you today?"],
+    ["Good morning", "Good morning to you too!"],
+    ["Thank you", "You're welcome!"],
+    ["How are you ?", "I'm doing well, thank you!"],
+    ["How are you bot", "I'm just a machine, I have no feelings but I'm here to help!"],
+    ["What is your name", "My name is DFCC GPT. How can I assist you?"],
+    ["Good afternoon", "Good afternoon! How may I help you?"],
+    ["Good evening", "Good evening! How may I assist you?"],
+    ["Good night", "Good night! Sleep well."],
+    ["Bye", "Bye!"],
+    ];
+
+    const regex = new RegExp(`^(${greetingTypes.map(([greeting]) => greeting).join("|")})$`, "i");
+    const greetingMatch = question.trim().match(regex);
+
+
+    if (greetingMatch) {
+      const [, matchedGreeting] = greetingMatch;
+      const matchedGreetingType = greetingTypes.find(([greeting]) => greeting.toLowerCase() === matchedGreeting.toLowerCase());
+      if (matchedGreetingType) {
+        const [, reply] = matchedGreetingType;
+          
+        console.log(reply);
+
+        setTimeout(()=>{
+          setMessageState((state) => ({
+            ...state,
+            messages: [
+              ...state.messages,
+              {
+                type: 'apiMessage',
+                message: reply,
+              },
+            ],
+            pending: undefined,
+          }));
+          setLoading(false);
+        },3000)
+      } else {
+        console.log("I'm sorry, I didn't catch that.");
       }
-      // get user message
-      let question = query.trim();
 
-      // set user message array
-      setMessageState((state) => ({
-        ...state,
-        messages: [
-          ...state.messages,
-          {
-            type: 'userMessage',
-            message: question,
-          },
-        ],
-        pending: undefined,
-      }));
 
-      console.log('user message : ', question);
+      // try {
+      //   const response = await fetch("/api/generate", {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({ question: question }),
+      //   });
 
-      setLoading(true);
-      setQuery('');
-      setMessageState((state) => ({ ...state, pending: '' }));
+      //   const data = await response.json();
+      //   if (response.status !== 200) {
+      //     throw data.error || new Error(`Request failed with status ${response.status}`);
+      //   }
 
-      const ctrl = new AbortController();
+      //   setMessageState((state) => ({
+      //     ...state,
+      //     messages: [
+      //       ...state.messages,
+      //       {
+      //         type: 'apiMessage',
+      //         message: data.result,
+      //       },
+      //     ],
+      //     pending: undefined,
+      //   }));
+      //   setLoading(false);
+      // } catch (error) {
+      //   console.error(error);
+      // }
 
+    } else {
       // send user message to api endpoint
       try {
         fetchEventSource('/api/chat', {
@@ -131,7 +225,7 @@ export default function Chatbot() {
               }));
               setLoading(false);
               ctrl.abort();
-              
+
             } else {
               const data = JSON.parse(event.data);
               if (data.sourceDocs) {
@@ -153,7 +247,8 @@ export default function Chatbot() {
         setError('An error occurred while fetching the data. Please try again.');
         console.log('error', error);
       }
-    // }
+    }
+
   }
 
 
@@ -187,12 +282,12 @@ export default function Chatbot() {
       ...messages,
       ...(pending
         ? [
-            {
-              type: 'apiMessage',
-              message: pending,
-              sourceDocs: pendingSourceDocs,
-            },
-          ]
+          {
+            type: 'apiMessage',
+            message: pending,
+            sourceDocs: pendingSourceDocs,
+          },
+        ]
         : []),
     ];
   }, [messages, pending, pendingSourceDocs]);
@@ -209,7 +304,7 @@ export default function Chatbot() {
     }
   }, [chatMessages]);
 
-console.log(messages)
+  console.log(messages)
 
 
 
