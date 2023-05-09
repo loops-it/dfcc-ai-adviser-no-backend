@@ -119,19 +119,35 @@ export default function Chatbot() {
     // const regex = new RegExp(`^(${greetingTypes.join("|")})$`, "i");
     // const greetingIncluded = regex.test(question.trim());
 
-    const greetingTypes = [
-    ["What is your name", "My name is DFCC GPT."],
-    ["Who is your creator", "My creator is xyz"],
-    ];
+    // const greetingTypes = [
+    // ["What is your name", "My name is DFCC GPT."],
+    // ["Who is your creator", "My creator is xyz"],
+    // ];
+
+    // const matchedGreetingType = greetingTypes.find(([greeting]) => greeting.toLowerCase() === question.toLowerCase());
 
     // const regex = new RegExp(`^(${greetingTypes.map(([greeting]) => greeting).join("|")})$`, "i");
     // const greetingMatch = question.trim().match(regex);
-    const matchedGreetingType = greetingTypes.find(([greeting]) => greeting.toLowerCase() === question.toLowerCase());
 
-    if(matchedGreetingType){
-        const [, reply] = matchedGreetingType;
+    const response = await fetch("/api/botInformationCheck", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question: question }),
+    });
 
-        console.log(reply);
+    const data = await response.json();
+    if (response.status !== 200) {
+      throw data.error || new Error(`Request failed with status ${response.status}`);
+    }
+    const matchedGreetingType = data.info_result;
+    console.log("matchedGreetingType : ", matchedGreetingType )
+
+    if(matchedGreetingType.toLowerCase().includes("name")){
+        // const [, reply] = matchedGreetingType;
+
+        // console.log(reply);
 
         setTimeout(()=>{
           setMessageState((state) => ({
@@ -140,14 +156,47 @@ export default function Chatbot() {
               ...state.messages,
               {
                 type: 'apiMessage',
-                message: reply,
+                message: "My name is DFCC GPT.",
               },
             ],
             pending: undefined,
           }));
           setLoading(false);
         },3000)
-    }else{
+    }
+    else if(matchedGreetingType.toLowerCase().includes("age")){
+      setTimeout(()=>{
+        setMessageState((state) => ({
+          ...state,
+          messages: [
+            ...state.messages,
+            {
+              type: 'apiMessage',
+              message: "I'm 20 years old",
+            },
+          ],
+          pending: undefined,
+        }));
+        setLoading(false);
+      },3000)
+    }
+    else if(matchedGreetingType.toLowerCase().includes("country")){
+      setTimeout(()=>{
+        setMessageState((state) => ({
+          ...state,
+          messages: [
+            ...state.messages,
+            {
+              type: 'apiMessage',
+              message: "I live in Sri Lanka",
+            },
+          ],
+          pending: undefined,
+        }));
+        setLoading(false);
+      },3000)
+    }
+    else{
       const response = await fetch("/api/generateGreeting", {
         method: "POST",
         headers: {
