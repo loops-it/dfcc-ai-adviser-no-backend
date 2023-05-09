@@ -28,7 +28,7 @@ export default async function (req: { body: { question: string; }; }, res: { sta
   try {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: `Is "${userQuestion}" is asking about your name, age, country or address? if it is about name just say "name", if it is about age just say "age", if it is about your country or address just say "country" if it is not about name or age or country just say "other" ? Do not use any other punctuation or words in the answer.`,
+      prompt: `Is "${userQuestion}" is asking about your name or age or country? if it is about name just say "name", if it is about age just say "age", if it is about country just say "country" if it is not about name or age or country just say "other" ? Do not use any other punctuation or words in the answer.`,
       temperature: 0.6,
     });
     console.log(completion.data.choices[0].text);
