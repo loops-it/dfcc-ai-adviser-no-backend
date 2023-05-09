@@ -121,7 +121,7 @@ export default function Chatbot() {
 
     const greetingTypes = [
     ["What is your name", "My name is DFCC GPT."],
-    ["Who is your creator", "My creator is xyz IT solutions"],
+    ["Who is your creator", "My creator is xyz"],
     ];
 
     // const regex = new RegExp(`^(${greetingTypes.map(([greeting]) => greeting).join("|")})$`, "i");
