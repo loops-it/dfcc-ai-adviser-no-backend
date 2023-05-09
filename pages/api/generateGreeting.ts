@@ -5,7 +5,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-export default async function (req: { body: { question: string; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error?: { message: string; } | { message: string; } | { message: string; }; result?: string | undefined; }): void; new(): any; }; }; }) {
+export default async function (req: { body: { question: string; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error?: { message: string; } | { message: string; } | { message: string; }; greet_result?: string | undefined; }): void; new(): any; }; }; }) {
   if (!configuration.apiKey) {
     res.status(500).json({
       error: {
@@ -28,10 +28,11 @@ export default async function (req: { body: { question: string; }; }, res: { sta
   try {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: `Friendly reply to: ${userQuestion} and do Not ask any questions.`,
+      prompt: `Is "${userQuestion}" is a greeting ? yes or no? Do not use any other punctuation or words in the answer`,
       temperature: 0.6,
     });
-    res.status(200).json({ result: completion.data.choices[0].text });
+    console.log(completion.data.choices[0].text);
+    res.status(200).json({ greet_result: completion.data.choices[0].text });
   } catch(error) {
       res.status(500).json({
         error: {

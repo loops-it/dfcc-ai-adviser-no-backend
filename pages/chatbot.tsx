@@ -120,30 +120,17 @@ export default function Chatbot() {
     // const greetingIncluded = regex.test(question.trim());
 
     const greetingTypes = [
-      ["Hi", "Hello there!"],
-    ["Hello", "Hi!"],
-    ["Hi,there", "Hi! How can I assist you today?"],
-    ["Good morning", "Good morning to you too!"],
-    ["Thank you", "You're welcome!"],
-    ["How are you ?", "I'm doing well, thank you!"],
-    ["How are you bot", "I'm just a machine, I have no feelings but I'm here to help!"],
-    ["What is your name", "My name is DFCC GPT. How can I assist you?"],
-    ["Good afternoon", "Good afternoon! How may I help you?"],
-    ["Good evening", "Good evening! How may I assist you?"],
-    ["Good night", "Good night! Sleep well."],
-    ["Bye", "Bye!"],
+    ["What is your name", "My name is DFCC GPT."],
+    ["Who is your creator", "My creator is xyz IT solutions"],
     ];
 
-    const regex = new RegExp(`^(${greetingTypes.map(([greeting]) => greeting).join("|")})$`, "i");
-    const greetingMatch = question.trim().match(regex);
+    // const regex = new RegExp(`^(${greetingTypes.map(([greeting]) => greeting).join("|")})$`, "i");
+    // const greetingMatch = question.trim().match(regex);
+    const matchedGreetingType = greetingTypes.find(([greeting]) => greeting.toLowerCase() === question.toLowerCase());
 
-
-    if (greetingMatch) {
-      const [, matchedGreeting] = greetingMatch;
-      const matchedGreetingType = greetingTypes.find(([greeting]) => greeting.toLowerCase() === matchedGreeting.toLowerCase());
-      if (matchedGreetingType) {
+    if(matchedGreetingType){
         const [, reply] = matchedGreetingType;
-          
+
         console.log(reply);
 
         setTimeout(()=>{
@@ -160,43 +147,54 @@ export default function Chatbot() {
           }));
           setLoading(false);
         },3000)
-      } else {
-        console.log("I'm sorry, I didn't catch that.");
+    }else{
+      const response = await fetch("/api/generateGreeting", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question: question }),
+      });
+
+      const data = await response.json();
+      if (response.status !== 200) {
+        throw data.error || new Error(`Request failed with status ${response.status}`);
+      }
+      const isGreet = data.greet_result;
+      console.log("isGreet : ", isGreet )
+
+    if (isGreet.toLowerCase().includes("yes")) {
+      try {
+        const response = await fetch("/api/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ question: question }),
+        });
+
+        const data = await response.json();
+        if (response.status !== 200) {
+          throw data.error || new Error(`Request failed with status ${response.status}`);
+        }
+
+        setMessageState((state) => ({
+          ...state,
+          messages: [
+            ...state.messages,
+            {
+              type: 'apiMessage',
+              message: data.result,
+            },
+          ],
+          pending: undefined,
+        }));
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
       }
 
-
-      // try {
-      //   const response = await fetch("/api/generate", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({ question: question }),
-      //   });
-
-      //   const data = await response.json();
-      //   if (response.status !== 200) {
-      //     throw data.error || new Error(`Request failed with status ${response.status}`);
-      //   }
-
-      //   setMessageState((state) => ({
-      //     ...state,
-      //     messages: [
-      //       ...state.messages,
-      //       {
-      //         type: 'apiMessage',
-      //         message: data.result,
-      //       },
-      //     ],
-      //     pending: undefined,
-      //   }));
-      //   setLoading(false);
-      // } catch (error) {
-      //   console.error(error);
-      // }
-
     } else {
-      // send user message to api endpoint
       try {
         fetchEventSource('/api/chat', {
           method: 'POST',
@@ -248,6 +246,27 @@ export default function Chatbot() {
         console.log('error', error);
       }
     }
+    }
+
+
+    // const response = await fetch('http://localhost:5000/nlp', {
+    //       method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify({ question: question }),
+    //     });
+
+    //     if (response.status !== 200) {
+    //       const error = await response.json();
+    //       throw new Error(error.message);
+    //     }
+    //     const data = await response.json();
+    //     const sentimentScore = data.sentimentScore;
+    // const greetingMatch = data;
+    // console.log('sentiment : ', greetingMatch);
+    // try {
+      
 
   }
 
